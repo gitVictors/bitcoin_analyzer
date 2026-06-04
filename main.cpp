@@ -14,6 +14,7 @@
 
 
 int main(int argc, char* argv[]) {
+
     // Initialize CURL globally
     curl_global_init(CURL_GLOBAL_DEFAULT);
 

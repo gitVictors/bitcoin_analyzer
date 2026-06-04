@@ -21,21 +21,25 @@ private:
     BitcoinClient& bitcoinClient;
     BlockParser parser;
     BlockHasher hasher;
-    uint32_t nonceStart, nonceEnd, nonceStep;
+    uint32_t nonceStart_;
+    uint32_t nonceEnd_;
+    uint32_t nonceStep_;
     std::vector<int> resultArray;
     int maxLag;
 
     void interactiveInputBlockHeight() {
+
         uint32_t height;
         std::cout << "Enter block number: ";
         std::cin >> height;
 
         try {
             auto rawBlock = bitcoinClient.fetchBlockByHeight(height);
-            parser.parseFromRawBlock(rawBlock);
+            parser.parseFromJson(rawBlock);
             std::cout << "Loaded block #" << height << std::endl;
             std::cout << "Original nonce = " << parser.getNonce() << " (0x"
                 << std::hex << parser.getNonce() << std::dec << ")" << std::endl;
+            std::cout << "Hash = " << "0x" << std::hex << parser.getBlockId() << std::endl;
         }
         catch (const std::exception& e) {
             std::cerr << "Error loading block: " << e.what() << std::endl;
@@ -44,18 +48,19 @@ private:
     }
 
     void interactiveInputNonceRange() {
+
         std::cout << "\nEnter nonce range:" << std::endl;
         std::cout << "Start value: ";
-        std::cin >> nonceStart;
+        std::cin >> nonceStart_;
         std::cout << "End value: ";
-        std::cin >> nonceEnd;
+        std::cin >> nonceEnd_;
         std::cout << "Step value: ";
-        std::cin >> nonceStep;
+        std::cin >> nonceStep_;
 
-        if (nonceStep == 0) {
+        if (nonceStep_ == 0) {
             throw std::runtime_error("Step cannot be zero");
         }
-        if (nonceStart > nonceEnd) {
+        if (nonceStart_ > nonceEnd_) {
             throw std::runtime_error("Start value cannot be greater than end value");
         }
     }
@@ -63,15 +68,15 @@ private:
     void processNonceRange() {
         resultArray.clear();
 
-        size_t totalSteps = ((nonceEnd - nonceStart) / nonceStep) + 1;
+        size_t totalSteps = ((nonceEnd_ - nonceStart_) / nonceStep_) + 1;
         size_t progressStep = std::max<size_t>(1, totalSteps / 100);
 
         std::cout << "\nProcessing " << totalSteps << " nonce values..." << std::endl;
 
-        uint32_t currentNonce = nonceStart;
+        uint32_t currentNonce = nonceStart_;
         size_t processed = 0;
 
-        while (currentNonce <= nonceEnd) {
+        while (currentNonce <= nonceEnd_) {
             parser.setNonce(currentNonce);
             auto header = parser.getRawHeader();
             hasher.computeHashWithSteps(header);
@@ -83,10 +88,10 @@ private:
                 std::cout << "Progress: " << (processed * 100 / totalSteps) << "%\r" << std::flush;
             }
 
-            if (currentNonce > nonceEnd - nonceStep) {
+            if (currentNonce > nonceEnd_ - nonceStep_) {
                 break;
             }
-            currentNonce += nonceStep;
+            currentNonce += nonceStep_;
         }
 
         std::cout << "Processing complete. " << resultArray.size() << " values collected." << std::endl;
@@ -112,11 +117,11 @@ private:
         file << "# Zero counts for each nonce" << std::endl;
         file << "# Format: nonce_value zero_count" << std::endl;
 
-        uint32_t currentNonce = nonceStart;
+        uint32_t currentNonce = nonceStart_;
         for (size_t i = 0; i < resultArray.size(); i++) {
             file << currentNonce << " " << resultArray[i] << std::endl;
-            if (currentNonce <= nonceEnd - nonceStep) {
-                currentNonce += nonceStep;
+            if (currentNonce <= nonceEnd_ - nonceStep_) {
+                currentNonce += nonceStep_;
             }
         }
 
@@ -131,7 +136,11 @@ private:
 
 public:
     Orchestrator(BitcoinClient& client, int maxLagConfig, int zeroCountMode)
-        : bitcoinClient(client), hasher(zeroCountMode), maxLag(maxLagConfig) {
+        : bitcoinClient(client), hasher(zeroCountMode), maxLag(maxLagConfig)
+        , nonceStart_(0)
+        , nonceEnd_(0)
+        , nonceStep_(0)
+    {
     }
 
     void run() {

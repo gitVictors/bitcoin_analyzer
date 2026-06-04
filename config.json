@@ -1,5 +1,5 @@
 {
-  "bitcoin_api_url": "https://blockchain.info/rawblock/",
+  "bitcoin_api_url": "https://mempool.space/",
   "network_timeout_seconds": 10,
   "zero_counting_mode": 1,
   "max_lag_for_autocorrelation": 50
