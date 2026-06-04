@@ -24,7 +24,7 @@ private:
     uint32_t nonceStart_;
     uint32_t nonceEnd_;
     uint32_t nonceStep_;
-    std::vector<int> resultArray;
+    std::vector<int> resultArray_;
     int maxLag;
 
     void interactiveInputBlockHeight() {
@@ -50,7 +50,7 @@ private:
     void interactiveInputNonceRange() {
 
         std::cout << "\nEnter nonce range:" << std::endl;
-        std::cout << "Start value: ";
+        std::cout << "Start value ";
         std::cin >> nonceStart_;
         std::cout << "End value: ";
         std::cin >> nonceEnd_;
@@ -66,7 +66,8 @@ private:
     }
 
     void processNonceRange() {
-        resultArray.clear();
+
+        resultArray_.clear();
 
         size_t totalSteps = ((nonceEnd_ - nonceStart_) / nonceStep_) + 1;
         size_t progressStep = std::max<size_t>(1, totalSteps / 100);
@@ -77,10 +78,12 @@ private:
         size_t processed = 0;
 
         while (currentNonce <= nonceEnd_) {
+
             parser.setNonce(currentNonce);
             auto header = parser.getRawHeader();
+
             hasher.computeHashWithSteps(header);
-            resultArray.push_back(hasher.getZeroCount());
+            resultArray_.push_back(hasher.getZeroCount());
             hasher.reset();
 
             processed++;
@@ -94,7 +97,7 @@ private:
             currentNonce += nonceStep_;
         }
 
-        std::cout << "Processing complete. " << resultArray.size() << " values collected." << std::endl;
+        std::cout << "Processing complete. " << resultArray_.size() << " values collected." << std::endl;
     }
 
     void outputResults(const std::vector<double>& autocorr) {
@@ -118,15 +121,15 @@ private:
         file << "# Format: nonce_value zero_count" << std::endl;
 
         uint32_t currentNonce = nonceStart_;
-        for (size_t i = 0; i < resultArray.size(); i++) {
-            file << currentNonce << " " << resultArray[i] << std::endl;
+        for (size_t i = 0; i < resultArray_.size(); i++) {
+            file << currentNonce << " " << resultArray_[i] << std::endl;
             if (currentNonce <= nonceEnd_ - nonceStep_) {
                 currentNonce += nonceStep_;
             }
         }
 
         file << "\n# Autocorrelation results" << std::endl;
-        auto autocorr = Autocorrelator::compute(resultArray, maxLag);
+        auto autocorr = Autocorrelator::compute(resultArray_, maxLag);
         for (size_t i = 0; i < autocorr.size(); i++) {
             file << i << " " << autocorr[i] << std::endl;
         }
@@ -149,12 +152,12 @@ public:
             interactiveInputNonceRange();
             processNonceRange();
 
-            if (resultArray.empty()) {
+            if (resultArray_.empty()) {
                 std::cerr << "Error: No results generated" << std::endl;
                 return;
             }
 
-            auto autocorr = Autocorrelator::compute(resultArray, maxLag);
+            auto autocorr = Autocorrelator::compute(resultArray_, maxLag);
             outputResults(autocorr);
 
             char saveChoice;

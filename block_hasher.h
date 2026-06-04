@@ -16,10 +16,11 @@ class BlockHasher {
 private:
     Sha256StepRecorder stepRecorder;
     std::vector<uint8_t> allStepsFlattened;
-    int zeroCount;
+    int zeroCount_;
     int zeroCountingMode;
 
     void flattenAndCountZeros() {
+
         allStepsFlattened.clear();
         const auto& steps = stepRecorder.getStepStates();
 
@@ -29,12 +30,12 @@ private:
         }
 
         // Count zeros based on mode
-        zeroCount = 0;
+        zeroCount_ = 0;
 
         if (zeroCountingMode == 1) { // Byte mode
             for (uint8_t byte : allStepsFlattened) {
                 if (byte == 0) {
-                    zeroCount++;
+                    zeroCount_++;
                 }
             }
         }
@@ -47,16 +48,17 @@ private:
                 word |= (allStepsFlattened[i * 4 + 2] << 16);
                 word |= (allStepsFlattened[i * 4 + 3] << 24);
                 if (word == 0) {
-                    zeroCount++;
+                    zeroCount_++;
                 }
             }
         }
     }
 
 public:
-    BlockHasher(int mode) : zeroCountingMode(mode), zeroCount(0) {}
+    BlockHasher(int mode) : zeroCountingMode(mode), zeroCount_(0) {}
 
     void computeHashWithSteps(const std::vector<uint8_t>& header) {
+
         stepRecorder.reset();
 
         // First SHA-256 pass
@@ -75,12 +77,12 @@ public:
     }
 
     int getZeroCount() const {
-        return zeroCount;
+        return zeroCount_;
     }
 
     void reset() {
         stepRecorder.reset();
         allStepsFlattened.clear();
-        zeroCount = 0;
+        zeroCount_ = 0;
     }
 };

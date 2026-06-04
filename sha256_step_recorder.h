@@ -16,6 +16,7 @@
 #include <bit>
 
 class Sha256StepRecorder {
+
 private:
     // SHA-256 constants
     static constexpr uint32_t K[64] = {
@@ -124,6 +125,7 @@ public:
     }
 
     void finalize(uint8_t* output) {
+
         // Padding
         size_t originalLen = bufferIndex;
         uint8_t padding[64];
