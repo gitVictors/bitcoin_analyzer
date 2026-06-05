@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <cstring>
 #include <bit>
+#include <iostream>
 
 class Sha256StepRecorder {
 
@@ -37,6 +38,7 @@ private:
     std::vector<std::array<uint8_t, 32>> stepStates;
 
     void transform(const uint8_t* chunk) {
+
         uint32_t w[64];
         uint32_t work[8];
 
@@ -72,22 +74,32 @@ private:
             work[2] = work[1];
             work[1] = work[0];
             work[0] = temp1 + temp2;
+            //std::cout << std::hex << work[0] << " " << work[1] << " " << work[2] << " " << work[3]
+            //    << " " << work[4] << " " << work[5] << " " << work[6] << " " << work[7] << std::endl;
         }
 
         // Add compressed chunk to hash
         for (int i = 0; i < 8; i++) {
             h[i] += work[i];
         }
+        std::cout << std::hex << work[0] << " " << work[1] << " " << work[2] << " " << work[3]
+            << " " << work[4] << " " << work[5] << " " << work[6] << " " << work[7] << std::endl;
     }
 
     void addToBuffer(const uint8_t* data, size_t len) {
+
         for (size_t i = 0; i < len; i++) {
             buffer[bufferIndex++] = data[i];
-            if (bufferIndex == 64) {
-                transform(buffer);
-                bufferIndex = 0;
-            }
         }
+
+        if (bufferIndex == 64) {
+            transform(buffer);
+            bufferIndex = 0;
+        }
+        else if (bufferIndex == 32) {
+
+        }
+
     }
 
     void recordState() {

@@ -11,6 +11,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <nlohmann/json.hpp>
+#include <iostream>
 
 #define BITCOIN_BLOCK  80
 #define SHA256_BYTE    32
@@ -19,7 +20,7 @@ using json = nlohmann::json;
 
 class BlockParser {
 private:
-    std::vector<uint8_t> rawHeader_; //заголовок блока Биткойна в бинарном виде (ровно 80 байт) !TODO - их нет
+    std::vector<uint8_t> rawHeader_; //заголовок блока Биткойна в бинарном виде (ровно 80 байт)
     std::vector<uint8_t> rawBlock_; //полный сырой блок Биткойна (заголовок + все транзакции)
     uint32_t nonce_;
     uint32_t height_;
@@ -64,6 +65,7 @@ private:
 
     // Основная функция компиляции 80-байтового заголовка
     std::vector<uint8_t> getRawHandler(const json& blockJson) {
+
         std::vector<uint8_t> header;
         header.reserve(80); // Заголовок всегда равен 80 байтам
 
@@ -143,6 +145,15 @@ public:
         }
 
         rawHeader_ = getRawHandler(blockJson);
+        //debug
+        //std::cout <<  "Raw Header for hesh: " ;
+        //for (int i = 0; i < rawHeader_.size(); ++i) {
+        //     std::cout << std::hex << std::setw(2) << std::setfill('0') 
+        //      << static_cast<int>(rawHeader_[i]);
+        //}
+        //std::cout << std::endl;
+        //end debug
+
 
         // Note: rawBlock_ remain empty when parsing from JSON
         // because we don't have the raw binary block data
@@ -166,6 +177,15 @@ public:
             throw std::runtime_error("Raw header not available (parsed from JSON)");
         }
         return rawHeader_;
+    }
+
+    const void outRawHeader() const {
+
+        for (int i = 0 ; i < rawHeader_.size(); ++i)
+            std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(rawHeader_[i]);
+
+        std::cout << std::endl;
+    
     }
 
     const std::vector<uint8_t>& getRawBlock() const {

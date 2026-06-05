@@ -40,6 +40,7 @@ private:
             std::cout << "Original nonce = " << parser.getNonce() << " (0x"
                 << std::hex << parser.getNonce() << std::dec << ")" << std::endl;
             std::cout << "Hash = " << "0x" << std::hex << parser.getBlockId() << std::endl;
+            parser.outRawHeader();   
         }
         catch (const std::exception& e) {
             std::cerr << "Error loading block: " << e.what() << std::endl;
@@ -79,8 +80,10 @@ private:
 
         while (currentNonce <= nonceEnd_) {
 
-            parser.setNonce(currentNonce);
+            //parser.setNonce(currentNonce);
+            parser.setNonce(nonceEnd_);
             auto header = parser.getRawHeader();
+            parser.outRawHeader(); //for debug
 
             hasher.computeHashWithSteps(header);
             resultArray_.push_back(hasher.getZeroCount());
