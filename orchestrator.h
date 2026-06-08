@@ -16,15 +16,20 @@
 #include <iomanip>
 #include <fstream>
 
+#define ONLY_CONF  1
+
 class Orchestrator {
+
 private:
+
     BitcoinClient& bitcoinClient;
     BlockParser parser;
     BlockHasher hasher;
     uint32_t nonceStart_;
     uint32_t nonceEnd_;
     uint32_t nonceStep_;
-    std::vector<int> resultArray_;
+    std::vector<uint32_t> resultArray_;
+    //std::unordered_map<uint32_t, uint64_t > resultArray_;
     int maxLag;
 
     void interactiveInputBlockHeight() {
@@ -48,8 +53,9 @@ private:
         }
     }
 
-    void interactiveInputNonceRange() {
+    void interactiveInputNonceRange(Config config) {
 
+#if ONLY_CONF == 0
         std::cout << "\nEnter nonce range:" << std::endl;
         std::cout << "Start value ";
         std::cin >> nonceStart_;
@@ -57,6 +63,18 @@ private:
         std::cin >> nonceEnd_;
         std::cout << "Step value: ";
         std::cin >> nonceStep_;
+#else
+        std::cout << "\nEnter nonce range:" << std::endl;
+        nonceStart_ = config.getNonce();
+        std::cout << "Start value " << nonceStart_;
+        nonceEnd_ = config.getNonceEnd();
+        std::cout << "End value: " << nonceEnd_;
+        nonceStep_ = config.getNonceStart();
+        std::cout << "Step value: " << nonceStep_;
+        
+
+#endif
+
 
         if (nonceStep_ == 0) {
             throw std::runtime_error("Step cannot be zero");
@@ -80,11 +98,10 @@ private:
 
         while (currentNonce <= nonceEnd_) {
 
-            //parser.setNonce(currentNonce);
-            parser.setNonce(nonceEnd_);
+           
+            parser.setNonce(currentNonce);
             auto header = parser.getRawHeader();
-            parser.outRawHeader(); //for debug
-
+            
             hasher.computeHashWithSteps(header);
             resultArray_.push_back(hasher.getZeroCount());
             hasher.reset();
@@ -113,6 +130,7 @@ private:
     }
 
     void saveResultsToFile(const std::string& filename) {
+
         std::ofstream file(filename);
         if (!file.is_open()) {
             std::cerr << "Warning: Could not open file " << filename << " for writing" << std::endl;
@@ -149,10 +167,12 @@ public:
     {
     }
 
-    void run() {
+    void run(const Config config) {
+
         try {
+
             interactiveInputBlockHeight();
-            interactiveInputNonceRange();
+            interactiveInputNonceRange(config);
             processNonceRange();
 
             if (resultArray_.empty()) {
@@ -160,8 +180,8 @@ public:
                 return;
             }
 
-            auto autocorr = Autocorrelator::compute(resultArray_, maxLag);
-            outputResults(autocorr);
+            //auto autocorr = Autocorrelator::compute(resultArray_, maxLag);
+            //outputResults(autocorr);
 
             char saveChoice;
             std::cout << "\nSave results to file? (y/n): ";

@@ -19,11 +19,12 @@
 using json = nlohmann::json;
 
 class BlockParser {
+
 private:
     std::vector<uint8_t> rawHeader_; //заголовок блока Биткойна в бинарном виде (ровно 80 байт)
     std::vector<uint8_t> rawBlock_; //полный сырой блок Биткойна (заголовок + все транзакции)
-    uint32_t nonce_;
-    uint32_t height_;
+    uint32_t nonce_ = 0;
+    uint32_t height_ = 0;
     std::string blockId_;  //это  хеш
 
     void extractNonce() {
@@ -99,6 +100,7 @@ private:
     }
 
 public:
+
     void parseFromRawBlock(const std::vector<uint8_t>& rawBlock) {
         rawBlock_ = rawBlock;
 

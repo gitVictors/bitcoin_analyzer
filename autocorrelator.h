@@ -12,12 +12,15 @@
 #include <vector>
 #include <cmath>
 #include <stdexcept>
-
+#include <iomanip>
 
 
 class Autocorrelator {
+
 public:
-    static std::vector<double> compute(const std::vector<int>& data, int maxLag) {
+
+    static std::vector<double> compute(const std::vector<uint32_t>& data, int maxLag) {
+
         if (data.empty()) {
             throw std::runtime_error("Empty data array");
         }
@@ -26,14 +29,14 @@ public:
 
         // Calculate mean
         double mean = 0.0;
-        for (int val : data) {
+        for (uint32_t val : data) {
             mean += val;
         }
         mean /= n;
 
         // Calculate total variance
         double variance = 0.0;
-        for (int val : data) {
+        for (uint32_t val: data) {
             double diff = val - mean;
             variance += diff * diff;
         }

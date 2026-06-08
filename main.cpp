@@ -31,19 +31,22 @@ int main(int argc, char* argv[]) {
         config = Config::loadFromFile("config.json");
     }
 
+    
     std::cout << "Configuration:" << std::endl;
     std::cout << "  API URL: " << config.getBitcoinApiUrl() << std::endl;
     std::cout << "  Zero counting mode: " << config.getZeroCountingMode()
         << (config.getZeroCountingMode() == 1 ? " (byte mode)" : " (word mode)") << std::endl;
     std::cout << "  Max autocorrelation lag: " << config.getMaxLagForAutocorrelation() << std::endl;
     std::cout << std::endl;
+    
+    
 
     try {
         BitcoinClient client(config.getBitcoinApiUrl(), config.getNetworkTimeoutSeconds());
         Orchestrator orchestrator(client,
             config.getMaxLagForAutocorrelation(),
             config.getZeroCountingMode());
-        orchestrator.run();
+        orchestrator.run(config);
     }
     catch (const std::exception& e) {
         std::cerr << "Fatal error: " << e.what() << std::endl;
@@ -55,3 +58,19 @@ int main(int argc, char* argv[]) {
     std::cout << "\nProgram finished." << std::endl;
     return 0;
 }
+
+
+
+//// test debug ---------------------------------------------
+//       Sha256StepRecorder record;
+//       std::string empty("abc");
+//       std::vector<uint8_t>  input = record.stringToBytes(empty);
+//       std::vector<uint8_t> res = record.customSha256(input);
+
+//       std::vector<uint8_t> expected = record.hexToBytes(
+//           "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+//       );
+
+//       assert(res.size() == 32);
+//       assert(record.compareVectors(expected, res));
+////-----------------------------------------------------------
