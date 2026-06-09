@@ -249,6 +249,11 @@ public:
                 updateZeroDump(f);
                 updateZeroDump(hh);
 
+                
+                std::cout << std::hex << a << " " << b << " " << c << " " << d << " " << e << " " << f << " " << g << " " << hh << " ";
+                std::cout << std::dec << zeroDump_ << std::endl;
+                
+               
             }
 
             h[0] += a; h[1] += b; h[2] += c; h[3] += d;
@@ -257,6 +262,10 @@ public:
             for (int i = 0; i < 8; ++i) {
                 updateZeroDump(h[i]);
             }
+            for (int i = 0; i < 7; ++i) {
+                std::cout << std::hex << h[i] << " ";
+            }
+            std::cout << std::endl;
         }
 
         std::vector<uint8_t> result;

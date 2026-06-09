@@ -14,6 +14,7 @@ private:
     int networkTimeoutSeconds_;
     int zeroCountingMode_;
     int maxLagForAutocorrelation_;
+    uint32_t numBlock_;
     uint32_t nonce_;
     uint32_t nonceStart_;
     uint32_t nonceEnd_;
@@ -64,6 +65,8 @@ public:
                 config.nonceEnd_ = j["nonceEnd"];
             if (j.contains("step"))
                 config.step_ = j["step"];
+            if (j.contains("numBlock"))
+                config.numBlock_ = j["numBlock"];
         }
         catch (const std::exception& e) {
             std::cerr << "Error parsing config: " << e.what() << ". Using defaults." << std::endl;
@@ -81,5 +84,6 @@ public:
     uint32_t getNonceStart() const { return nonceStart_; }
     uint32_t getNonceEnd() const { return nonceEnd_; }
     uint32_t getStep() const { return  step_; }
+    uint32_t getNumBlock() const { return numBlock_;  }
 
 };

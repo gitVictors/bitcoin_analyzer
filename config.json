@@ -3,8 +3,10 @@
   "network_timeout_seconds": 10,
   "zero_counting_mode": 1,
   "max_lag_for_autocorrelation": 50,
-  "nonce": 952501,
-  "nonceStart": 952450,
-  "nonceEnd": 952501,
-  "step":  1
+
+  "numBlock": 952502,
+  "nonce": 3691714247,
+  "nonceStart": 3691714247,
+  "nonceEnd": 3691714247,
+  "step": 1
 }

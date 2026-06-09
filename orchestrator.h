@@ -16,7 +16,9 @@
 #include <iomanip>
 #include <fstream>
 
-#define ONLY_CONF  1
+#define ON  1
+#define OFF 0
+#define ONLY_CONF  ON
 
 class Orchestrator {
 
@@ -32,11 +34,17 @@ private:
     //std::unordered_map<uint32_t, uint64_t > resultArray_;
     int maxLag;
 
-    void interactiveInputBlockHeight() {
-
+    void interactiveInputBlockHeight(Config config) {
         uint32_t height;
+
+#if ONLY_CONF == 0
         std::cout << "Enter block number: ";
         std::cin >> height;
+#else
+        std::cout << "Enter block number: ";
+        std::cout << config.getNumBlock();
+        height = config.getNumBlock();
+#endif
 
         try {
             auto rawBlock = bitcoinClient.fetchBlockByHeight(height);
@@ -72,7 +80,6 @@ private:
         nonceStep_ = config.getNonceStart();
         std::cout << "Step value: " << nonceStep_;
         
-
 #endif
 
 
@@ -171,7 +178,7 @@ public:
 
         try {
 
-            interactiveInputBlockHeight();
+            interactiveInputBlockHeight(config);
             interactiveInputNonceRange(config);
             processNonceRange();
 
@@ -180,8 +187,8 @@ public:
                 return;
             }
 
-            //auto autocorr = Autocorrelator::compute(resultArray_, maxLag);
-            //outputResults(autocorr);
+            auto autocorr = Autocorrelator::compute(resultArray_, maxLag);
+            outputResults(autocorr);
 
             char saveChoice;
             std::cout << "\nSave results to file? (y/n): ";

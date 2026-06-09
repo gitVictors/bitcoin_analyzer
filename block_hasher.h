@@ -48,19 +48,3 @@ public:
    
     }
 };
-
-
-////debug  =======================================
-//for (uint8_t byte : header) {
-//    std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
-//}
-//std::cout << std::dec << std::endl;
-//for (uint8_t byte : firstHash) {
-//    std::cout << std::hex  << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
-//}
-//std::cout << std::dec << std::endl;
-//for (uint8_t byte : secontHash) {
-//    std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
-//}
-//std::cout << std::dec << std::endl;
-////===============================================
